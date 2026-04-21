@@ -54,16 +54,25 @@ A serverless IoT data pipeline on AWS that ingests real-time vehicle telemetry f
 
 ---
 
-## Demo Pages
+## Screenshots
 
-| Page | Description |
-|---|---|
-| [Architecture](docs/screenshots/01-architecture.html) | Service map, badges, design decisions |
-| [Simulator Output](docs/screenshots/02-simulator.html) | Live terminal — 24/24 readings ✓ 202 |
-| [API Query Response](docs/screenshots/03-api-query.html) | Enriched telemetry JSON from REST endpoint |
-| [CloudWatch Logs](docs/screenshots/04-cloudwatch-logs.html) | Structured JSON log entries with per-request tracing |
-| [S3 Data Lake](docs/screenshots/05-s3-data-lake.html) | raw/ and enriched/ bucket structure |
-| [IAM + Terraform](docs/screenshots/06-iam-terraform.html) | Least-privilege policies and module map |
+### Architecture
+[![Architecture](docs/screenshots/01-architecture.png)](docs/screenshots/01-architecture.html)
+
+### Simulator — 24/24 Readings Accepted
+[![Simulator](docs/screenshots/02-simulator.png)](docs/screenshots/02-simulator.html)
+
+### REST API — Enriched Telemetry Response
+[![API Query](docs/screenshots/03-api-query.png)](docs/screenshots/03-api-query.html)
+
+### CloudWatch Logs — Structured JSON
+[![CloudWatch Logs](docs/screenshots/04-cloudwatch-logs.png)](docs/screenshots/04-cloudwatch-logs.html)
+
+### S3 Data Lake — raw/ and enriched/ Prefixes
+[![S3 Data Lake](docs/screenshots/05-s3-data-lake.png)](docs/screenshots/05-s3-data-lake.html)
+
+### IAM Least-Privilege + Terraform Module Map
+[![IAM and Terraform](docs/screenshots/06-iam-terraform.png)](docs/screenshots/06-iam-terraform.html)
 
 ---
 
