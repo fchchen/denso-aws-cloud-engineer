@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IAM + Terraform — Vehicle Telemetry Service</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #c9d1d9; padding: 40px; }
+  h1 { font-size: 22px; color: #58a6ff; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #8b949e; margin-bottom: 28px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 960px; }
+  .code-block { background: #010409; border: 1px solid #30363d; border-radius: 10px; overflow: hidden; }
+  .code-bar { background: #161b22; padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #30363d; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .code-title { font-size: 11px; color: #8b949e; margin-left: 4px; font-family: 'Consolas', monospace; }
+  .code-body { padding: 16px 20px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; line-height: 1.7; }
+  .tf-resource { color: #ff7b72; }
+  .tf-string { color: #a5d6ff; }
+  .tf-var { color: #79c0ff; }
+  .tf-attr { color: #c9d1d9; }
+  .tf-comment { color: #8b949e; font-style: italic; }
+  .tf-key { color: #d2a8ff; }
+  .tf-val { color: #3fb950; }
+  .section-title { font-size: 15px; color: #58a6ff; margin: 28px 0 14px; }
+  .modules-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; max-width: 960px; }
+  .module-card { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; text-align: center; }
+  .module-icon { font-size: 20px; margin-bottom: 6px; }
+  .module-name { font-size: 11px; color: #8b949e; font-family: monospace; }
+</style>
+</head>
+<body>
+  <h1>IAM Least-Privilege + Terraform IaC</h1>
+  <div class="subtitle">Per-Lambda execution roles · Explicit ARN bindings · No wildcards on resources</div>
+
+  <div class="grid">
+    <div class="code-block">
+      <div class="code-bar">
+        <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+        <span class="code-title">modules/iam/main.tf — ingest-role policy</span>
+      </div>
+      <div class="code-body">
+<span class="tf-comment"># Ingest Lambda: write-only, no read access</span>
+<span class="tf-resource">data</span> <span class="tf-string">"aws_iam_policy_document"</span> <span class="tf-string">"ingest"</span> {
+
+  statement {
+    <span class="tf-attr">sid</span>     = <span class="tf-string">"S3Write"</span>
+    <span class="tf-attr">actions</span> = [<span class="tf-string">"s3:PutObject"</span>]
+    resources = [
+      <span class="tf-string">"${var.raw_bucket_arn}/raw/*"</span>
+    ]  <span class="tf-comment"># exact ARN, not "*"</span>
+  }
+
+  statement {
+    <span class="tf-attr">sid</span>     = <span class="tf-string">"DynamoWrite"</span>
+    <span class="tf-attr">actions</span> = [<span class="tf-string">"dynamodb:PutItem"</span>]
+    resources = [<span class="tf-var">var.dynamodb_table_arn</span>]
+    <span class="tf-comment"># cannot Read, Update, or Delete</span>
+  }
+
+  statement {
+    <span class="tf-attr">sid</span> = <span class="tf-string">"Logs"</span>
+    <span class="tf-attr">actions</span> = [
+      <span class="tf-string">"logs:CreateLogGroup"</span>,
+      <span class="tf-string">"logs:CreateLogStream"</span>,
+      <span class="tf-string">"logs:PutLogEvents"</span>
+    ]
+    resources = [
+      <span class="tf-string">"arn:aws:logs:us-east-1:${var.account_id}:log-group:/aws/lambda/*"</span>
+    ]
+  }
+}
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-bar">
+        <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+        <span class="code-title">modules/iam/main.tf — query-role policy</span>
+      </div>
+      <div class="code-body">
+<span class="tf-comment"># Query Lambda: read-only, cannot write</span>
+<span class="tf-resource">data</span> <span class="tf-string">"aws_iam_policy_document"</span> <span class="tf-string">"query"</span> {
+
+  statement {
+    <span class="tf-attr">sid</span>     = <span class="tf-string">"DynamoQuery"</span>
+    <span class="tf-attr">actions</span> = [<span class="tf-string">"dynamodb:Query"</span>]
+    resources = [
+      <span class="tf-var">var.dynamodb_table_arn</span>,
+      <span class="tf-string">"${var.dynamodb_table_arn}/index/TenantIndex"</span>
+    ]
+    <span class="tf-comment"># cannot Scan, PutItem, UpdateItem, DeleteItem</span>
+    <span class="tf-comment"># cannot touch S3 at all</span>
+  }
+
+  statement {
+    <span class="tf-attr">sid</span> = <span class="tf-string">"Logs"</span>
+    <span class="tf-attr">actions</span> = [
+      <span class="tf-string">"logs:CreateLogGroup"</span>,
+      <span class="tf-string">"logs:CreateLogStream"</span>,
+      <span class="tf-string">"logs:PutLogEvents"</span>
+    ]
+    resources = [
+      <span class="tf-string">"arn:aws:logs:us-east-1:${var.account_id}:log-group:/aws/lambda/*"</span>
+    ]
+  }
+}
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Terraform Module Structure — 7 modules, 53 resources</div>
+
+  <div class="modules-grid">
+    <div class="module-card">
+      <div class="module-icon">🌐</div>
+      <div class="module-name">vpc</div>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">VPC · 2 subnets · IGW · SG</p>
+    </div>
+    <div class="module-card">
+      <div class="module-icon">🔐</div>
+      <div class="module-name">iam</div>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">3 roles · 3 policies · least-privilege</p>
+    </div>
+    <div class="module-card">
+      <div class="module-icon">🪣</div>
+      <div class="module-name">s3</div>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">Bucket · versioning · SSE · lifecycle</p>
+    </div>
+    <div class="module-card">
+      <div class="module-icon">🗃️</div>
+      <div class="module-name">dynamodb</div>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">Table · GSI · PITR · on-demand</p>
+    </div>
+    <div class="module-card">
+      <div class="module-icon">λ</div>
+      <div class="module-name">lambda</div>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">3 functions · CW log groups · S3 permission</p>
+    </div>
+    <div class="module-card">
+      <div class="module-icon">🔀</div>
+      <div class="module-name">api_gateway</div>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">REST API · key · usage plan · 3 routes</p>
+    </div>
+    <div class="module-card">
+      <div class="module-icon">⚡</div>
+      <div class="module-name">cloudfront</div>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">Distribution · cache behaviors · origin secret</p>
+    </div>
+    <div class="module-card" style="border-color:#3fb950; background:#0d2218;">
+      <div class="module-icon" style="color:#3fb950">✓</div>
+      <div class="module-name" style="color:#3fb950">53 resources</div>
+      <p style="font-size:10px; color:#3fb950; margin-top:4px;">all deployed · $0 idle cost</p>
+    </div>
+  </div>
+</body>
+</html>

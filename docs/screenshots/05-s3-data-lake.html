@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>S3 Data Lake — Vehicle Telemetry Service</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #c9d1d9; padding: 40px; }
+  h1 { font-size: 22px; color: #58a6ff; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #8b949e; margin-bottom: 28px; }
+  .terminal { background: #010409; border: 1px solid #30363d; border-radius: 10px; overflow: hidden; max-width: 960px; margin-bottom: 24px; }
+  .terminal-bar { background: #161b22; padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #30363d; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .terminal-title { font-size: 12px; color: #8b949e; margin-left: 8px; }
+  .terminal-body { padding: 20px 24px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; line-height: 1.75; }
+  .cmd { color: #58a6ff; }
+  .dim { color: #6e7681; }
+  .raw { color: #f0883e; }
+  .enriched { color: #3fb950; }
+  .ts { color: #6e7681; }
+  .size { color: #8b949e; min-width: 60px; display: inline-block; text-align: right; margin-right: 12px; }
+  .path-prefix { color: #6e7681; }
+  .path-tenant { color: #d2a8ff; }
+  .path-vehicle { color: #e3b341; }
+  .path-date { color: #8b949e; }
+  .path-file { color: #c9d1d9; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 24px; max-width: 960px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+  .card h3 { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .card .value { font-size: 22px; font-weight: 700; }
+  .card .desc { font-size: 11px; color: #8b949e; margin-top: 4px; }
+</style>
+</head>
+<body>
+  <h1>S3 Data Lake — Raw &amp; Enriched Telemetry</h1>
+  <div class="subtitle">denso-vehicle-telemetry-raw-407043273463 · SSE-AES256 · Versioned · Lifecycle: IA→Glacier</div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-red"></div>
+      <div class="dot dot-yellow"></div>
+      <div class="dot dot-green"></div>
+      <span class="terminal-title">aws s3 ls s3://denso-vehicle-telemetry-raw-407043273463/ --recursive</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="dim">$</span> <span class="cmd">aws s3 ls s3://denso-vehicle-telemetry-raw-407043273463/raw/ --recursive | head -8</span></div>
+      <br>
+      <div><span class="ts">2026-04-21 12:55:05</span>  <span class="size">266</span>  <span class="raw">raw/</span><span class="path-tenant">TENANT#ACME-MOTORS/</span><span class="path-vehicle">VEHICLE#VIN-PH4UT2W7/</span><span class="path-date">2026-04-21/</span><span class="path-file">2938d1e1-87ff-4f49-9713-d8315566233f.json</span></div>
+      <div><span class="ts">2026-04-21 12:55:04</span>  <span class="size">266</span>  <span class="raw">raw/</span><span class="path-tenant">TENANT#ACME-MOTORS/</span><span class="path-vehicle">VEHICLE#VIN-PH4UT2W7/</span><span class="path-date">2026-04-21/</span><span class="path-file">40c752a9-fb9b-4051-93ec-c7623a4bd32b.json</span></div>
+      <div><span class="ts">2026-04-21 12:55:04</span>  <span class="size">264</span>  <span class="raw">raw/</span><span class="path-tenant">TENANT#ACME-MOTORS/</span><span class="path-vehicle">VEHICLE#VIN-PH4UT2W7/</span><span class="path-date">2026-04-21/</span><span class="path-file">42b3ba1f-fcf6-4124-b8cc-ddbeba483e80.json</span></div>
+      <div><span class="ts">2026-04-21 13:03:05</span>  <span class="size">265</span>  <span class="raw">raw/</span><span class="path-tenant">TENANT#ACME-MOTORS/</span><span class="path-vehicle">VEHICLE#VIN-TACM784E/</span><span class="path-date">2026-04-21/</span><span class="path-file">1ee33d86-aa65-4f09-b15e-7d4eb3072456.json</span></div>
+      <div><span class="ts">2026-04-21 13:03:02</span>  <span class="size">264</span>  <span class="raw">raw/</span><span class="path-tenant">TENANT#DENSO-CORP/</span><span class="path-vehicle">VEHICLE#VIN-Z4LTJYPR/</span><span class="path-date">2026-04-21/</span><span class="path-file">633fb406-7feb-4a0a-8e0b-9fd13f36bb1f.json</span></div>
+      <div><span class="ts">2026-04-21 13:03:03</span>  <span class="size">265</span>  <span class="raw">raw/</span><span class="path-tenant">TENANT#DENSO-CORP/</span><span class="path-vehicle">VEHICLE#VIN-Z4LTJYPR/</span><span class="path-date">2026-04-21/</span><span class="path-file">dd163d7a-438d-408c-b618-9d9b4d83530b.json</span></div>
+      <div style="color:#6e7681">...</div>
+      <br>
+      <div><span class="dim">$</span> <span class="cmd">aws s3 ls s3://denso-vehicle-telemetry-raw-407043273463/enriched/ --recursive | head -6</span></div>
+      <br>
+      <div><span class="ts">2026-04-21 12:55:07</span>  <span class="size">394</span>  <span class="enriched">enriched/</span><span class="path-tenant">TENANT#ACME-MOTORS/</span><span class="path-vehicle">VEHICLE#VIN-PH4UT2W7/</span><span class="path-date">2026-04-21/</span><span class="path-file">2938d1e1-87ff-4f49-9713-d8315566233f.json</span></div>
+      <div><span class="ts">2026-04-21 12:55:07</span>  <span class="size">393</span>  <span class="enriched">enriched/</span><span class="path-tenant">TENANT#ACME-MOTORS/</span><span class="path-vehicle">VEHICLE#VIN-PH4UT2W7/</span><span class="path-date">2026-04-21/</span><span class="path-file">40c752a9-fb9b-4051-93ec-c7623a4bd32b.json</span></div>
+      <div><span class="ts">2026-04-21 13:03:05</span>  <span class="size">394</span>  <span class="enriched">enriched/</span><span class="path-tenant">TENANT#DENSO-CORP/</span><span class="path-vehicle">VEHICLE#VIN-Z4LTJYPR/</span><span class="path-date">2026-04-21/</span><span class="path-file">c1952a44-6d3f-4f34-9159-b86b14ac05cc.json</span></div>
+      <div><span class="ts">2026-04-21 13:03:04</span>  <span class="size">392</span>  <span class="enriched">enriched/</span><span class="path-tenant">TENANT#DENSO-CORP/</span><span class="path-vehicle">VEHICLE#VIN-Z4LTJYPR/</span><span class="path-date">2026-04-21/</span><span class="path-file">dd163d7a-438d-408c-b618-9d9b4d83530b.json</span></div>
+      <div style="color:#6e7681">...</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Key Structure</h3>
+      <p style="font-size:12px; color:#8b949e; line-height:1.6;">
+        <span style="color:#f0883e">raw/</span><span style="color:#d2a8ff">{tenantId}/</span><span style="color:#e3b341">{deviceId}/</span><span style="color:#8b949e">{date}/</span><span style="color:#c9d1d9">{uuid}.json</span>
+        <br><br>Partition by tenant + date enables Athena SQL analytics and cost-efficient lifecycle rules.
+      </p>
+    </div>
+    <div class="card">
+      <h3>Security</h3>
+      <p style="font-size:12px; color:#8b949e; line-height:1.6;">
+        All public access blocked.<br>
+        SSE-AES256 at rest.<br>
+        IAM roles scoped to explicit ARNs — ingest role can only <code style="color:#3fb950">PutObject raw/*</code>.
+      </p>
+    </div>
+    <div class="card">
+      <h3>Cost Lifecycle</h3>
+      <p style="font-size:12px; color:#8b949e; line-height:1.6;">
+        raw/ → S3-IA after 30 days<br>
+        raw/ → Glacier after 90 days<br>
+        enriched/ stays in Standard for fast access.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
