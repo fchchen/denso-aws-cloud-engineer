@@ -1,0 +1,10 @@
+variable "project" { type = string }
+variable "environment" { type = string }
+variable "aws_region" { type = string }
+variable "raw_bucket_name" { type = string }
+variable "dynamodb_table_name" { type = string }
+variable "ingest_role_arn" { type = string }
+variable "enrichment_role_arn" { type = string }
+variable "query_role_arn" { type = string }
+variable "raw_bucket_arn" { type = string }
+variable "tags" { type = map(string) }

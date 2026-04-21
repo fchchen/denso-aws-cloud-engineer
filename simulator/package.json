@@ -1,0 +1,8 @@
+{
+  "name": "vehicle-telemetry-simulator",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node simulator.js"
+  }
+}
