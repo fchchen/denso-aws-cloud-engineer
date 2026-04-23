@@ -1,0 +1,15 @@
+syntax = "proto3";
+package denso.telemetry.v1;
+
+message VehicleTelemetry {
+  string device_id   = 1;
+  string tenant_id   = 2;
+  string timestamp   = 3;
+  float  speed       = 4;
+  int32  rpm         = 5;
+  float  fuel        = 6;
+  double lat         = 7;
+  double lng         = 8;
+  string message_id  = 9;
+  string received_at = 10;
+}

@@ -2,10 +2,11 @@ locals {
   build_dir = "${path.root}/../.build"
 
   common_env = {
-    TELEMETRY_BUCKET_NAME = var.raw_bucket_name
-    DYNAMODB_TABLE_NAME   = var.dynamodb_table_name
-    ENVIRONMENT           = var.environment
-    AWS_ACCOUNT_ID        = ""
+    TELEMETRY_BUCKET_NAME    = var.raw_bucket_name
+    DYNAMODB_TABLE_NAME      = var.dynamodb_table_name
+    ENVIRONMENT              = var.environment
+    KAFKA_BOOTSTRAP_BROKERS  = var.kafka_bootstrap_brokers
+    KAFKA_TOPIC              = "vehicle-telemetry"
   }
 }
 
@@ -32,6 +33,11 @@ resource "aws_lambda_function" "ingest" {
     variables = local.common_env
   }
 
+  vpc_config {
+    subnet_ids         = var.subnet_ids
+    security_group_ids = [var.lambda_sg_id]
+  }
+
   tags = var.tags
 }
 
@@ -39,6 +45,49 @@ resource "aws_cloudwatch_log_group" "ingest" {
   name              = "/aws/lambda/${aws_lambda_function.ingest.function_name}"
   retention_in_days = 7
   tags              = var.tags
+}
+
+# ---------- Consumer ----------
+
+resource "aws_lambda_function" "consumer" {
+  filename         = data.archive_file.all.output_path
+  function_name    = "${var.project}-${var.environment}-consumer"
+  role             = var.consumer_role_arn
+  handler          = "consumer/index.handler"
+  runtime          = "nodejs22.x"
+  memory_size      = 512
+  timeout          = 60
+  source_code_hash = data.archive_file.all.output_base64sha256
+
+  environment {
+    variables = local.common_env
+  }
+
+  vpc_config {
+    subnet_ids         = var.subnet_ids
+    security_group_ids = [var.lambda_sg_id]
+  }
+
+  tags = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "consumer" {
+  name              = "/aws/lambda/${aws_lambda_function.consumer.function_name}"
+  retention_in_days = 7
+  tags              = var.tags
+}
+
+resource "aws_lambda_event_source_mapping" "kafka" {
+  event_source_arn  = var.msk_cluster_arn
+  function_name     = aws_lambda_function.consumer.arn
+  starting_position = "LATEST"
+  batch_size        = 100
+
+  amazon_managed_kafka_event_source_config {
+    consumer_group_id = "vehicle-telemetry-consumers"
+  }
+
+  topics = ["vehicle-telemetry"]
 }
 
 # ---------- Enrichment ----------

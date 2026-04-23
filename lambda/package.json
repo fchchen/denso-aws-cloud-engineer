@@ -1,0 +1,10 @@
+{
+  "name": "vehicle-telemetry-lambda",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "protobufjs": "^7.4.0",
+    "aws-msk-iam-sasl-signer-js": "^1.0.3"
+  }
+}

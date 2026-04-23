@@ -55,6 +55,46 @@ module "s3" {
   tags        = local.tags
 }
 
+module "msk" {
+  source      = "./modules/msk"
+  project     = var.project
+  environment = var.environment
+  subnet_ids  = module.vpc.public_subnet_ids
+  kafka_sg_id = module.vpc.kafka_sg_id
+  tags        = local.tags
+}
+
+module "iam" {
+  source             = "./modules/iam"
+  project            = var.project
+  environment        = var.environment
+  account_id         = var.account_id
+  aws_region         = var.aws_region
+  raw_bucket_arn     = module.s3.raw_bucket_arn
+  dynamodb_table_arn = module.dynamodb.table_arn
+  msk_cluster_arn    = module.msk.cluster_arn
+  tags               = local.tags
+}
+
+module "lambda" {
+  source                  = "./modules/lambda"
+  project                 = var.project
+  environment             = var.environment
+  aws_region              = var.aws_region
+  raw_bucket_name         = module.s3.raw_bucket_name
+  raw_bucket_arn          = module.s3.raw_bucket_arn
+  dynamodb_table_name     = module.dynamodb.table_name
+  ingest_role_arn         = module.iam.ingest_role_arn
+  consumer_role_arn       = module.iam.consumer_role_arn
+  enrichment_role_arn     = module.iam.enrichment_role_arn
+  query_role_arn          = module.iam.query_role_arn
+  msk_cluster_arn         = module.msk.cluster_arn
+  kafka_bootstrap_brokers = module.msk.bootstrap_brokers
+  subnet_ids              = module.vpc.public_subnet_ids
+  lambda_sg_id            = module.vpc.lambda_sg_id
+  tags                    = local.tags
+}
+
 # S3 notification wired here (not inside the s3 module) to break the
 # circular dependency between s3 ↔ lambda modules.
 resource "aws_s3_bucket_notification" "raw" {
@@ -68,31 +108,6 @@ resource "aws_s3_bucket_notification" "raw" {
   }
 
   depends_on = [module.lambda]
-}
-
-module "iam" {
-  source             = "./modules/iam"
-  project            = var.project
-  environment        = var.environment
-  account_id         = var.account_id
-  aws_region         = var.aws_region
-  raw_bucket_arn     = module.s3.raw_bucket_arn
-  dynamodb_table_arn = module.dynamodb.table_arn
-  tags               = local.tags
-}
-
-module "lambda" {
-  source              = "./modules/lambda"
-  project             = var.project
-  environment         = var.environment
-  aws_region          = var.aws_region
-  raw_bucket_name     = module.s3.raw_bucket_name
-  raw_bucket_arn      = module.s3.raw_bucket_arn
-  dynamodb_table_name = module.dynamodb.table_name
-  ingest_role_arn     = module.iam.ingest_role_arn
-  enrichment_role_arn = module.iam.enrichment_role_arn
-  query_role_arn      = module.iam.query_role_arn
-  tags                = local.tags
 }
 
 module "api_gateway" {

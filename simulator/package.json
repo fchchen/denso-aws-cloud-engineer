@@ -4,5 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "node simulator.js"
+  },
+  "dependencies": {
+    "protobufjs": "^7.4.0"
   }
 }

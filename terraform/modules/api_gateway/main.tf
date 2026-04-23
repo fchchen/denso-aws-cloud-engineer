@@ -206,12 +206,12 @@ resource "aws_api_gateway_usage_plan" "main" {
   }
 
   throttle_settings {
-    burst_limit = 10
-    rate_limit  = 5
+    burst_limit = 5000
+    rate_limit  = 1000
   }
 
   quota_settings {
-    limit  = 1000
+    limit  = 10000000
     period = "DAY"
   }
 
