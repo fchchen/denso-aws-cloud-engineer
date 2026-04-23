@@ -8,76 +8,71 @@
   body { background: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #c9d1d9; padding: 40px; }
   h1 { font-size: 22px; color: #58a6ff; margin-bottom: 6px; }
   .subtitle { font-size: 13px; color: #8b949e; margin-bottom: 28px; }
-  .terminal { background: #010409; border: 1px solid #30363d; border-radius: 10px; overflow: hidden; max-width: 960px; margin-bottom: 24px; }
+  .terminal { background: #010409; border: 1px solid #30363d; border-radius: 10px; overflow: hidden; max-width: 960px; margin-bottom: 16px; }
   .terminal-bar { background: #161b22; padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #30363d; }
   .dot { width: 12px; height: 12px; border-radius: 50%; }
   .dot-red { background: #ff5f57; }
   .dot-yellow { background: #febc2e; }
   .dot-green { background: #28c840; }
   .terminal-title { font-size: 12px; color: #8b949e; margin-left: 8px; }
-  .terminal-body { padding: 20px 24px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; line-height: 1.7; }
+  .terminal-body { padding: 20px 24px; font-family: 'Consolas', 'Monaco', monospace; font-size: 11.5px; line-height: 1.75; }
   .cmd { color: #58a6ff; }
   .dim { color: #6e7681; }
   .ts { color: #6e7681; min-width: 220px; display: inline-block; }
-  .info { color: #3fb950; font-weight: bold; }
   .key { color: #79c0ff; }
   .val { color: #a5d6ff; }
   .num { color: #f0883e; }
-  .log-line { margin: 3px 0; display: flex; gap: 12px; }
-  .log-json { flex: 1; }
-  .callout { background: #161b22; border-left: 3px solid #58a6ff; padding: 12px 16px; border-radius: 0 6px 6px 0; margin-top: 16px; font-size: 12px; color: #8b949e; }
+  .green-val { color: #3fb950; }
+  .log-line { margin: 2px 0; }
+  .callout { background: #161b22; border-left: 3px solid #58a6ff; padding: 12px 16px; border-radius: 0 6px 6px 0; margin-top: 4px; font-size: 12px; color: #8b949e; max-width: 960px; }
   .callout strong { color: #58a6ff; }
   code { color: #e3b341; }
 </style>
 </head>
 <body>
-  <h1>CloudWatch Logs — Structured JSON Observability</h1>
-  <div class="subtitle">/aws/lambda/denso-vehicle-telemetry-dev-ingest · 7-day retention · real-time streaming</div>
+  <h1>CloudWatch Logs — 3-Lambda Pipeline</h1>
+  <div class="subtitle">Ingest → Consumer → Enrichment · structured JSON · protoBytes/jsonBytes comparison per request</div>
 
   <div class="terminal">
     <div class="terminal-bar">
-      <div class="dot dot-red"></div>
-      <div class="dot dot-yellow"></div>
-      <div class="dot dot-green"></div>
-      <span class="terminal-title">aws logs tail /aws/lambda/denso-vehicle-telemetry-dev-ingest --since 5m</span>
+      <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+      <span class="terminal-title">/aws/lambda/denso-vehicle-telemetry-dev-ingest — Protobuf decode + Kafka produce</span>
     </div>
     <div class="terminal-body">
-      <div><span class="dim">$</span> <span class="cmd">aws logs tail /aws/lambda/denso-vehicle-telemetry-dev-ingest --since 5m 2>&1 | grep '"level":"INFO"'</span></div>
-      <br>
+      <div class="log-line"><span class="ts">2026-04-23T10:12:01.203Z</span>{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Telemetry queued"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-Z4LTJYPR"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#DENSO-CORP"</span>, <span class="key">"protoBytes"</span>:<span class="num">85</span>, <span class="key">"jsonBytes"</span>:<span class="num">265</span>, <span class="key">"durationMs"</span>:<span class="num">5</span>}</div>
+      <div class="log-line"><span class="ts">2026-04-23T10:12:01.251Z</span>{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Telemetry queued"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-TACM784E"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#ACME-MOTORS"</span>, <span class="key">"protoBytes"</span>:<span class="num">85</span>, <span class="key">"jsonBytes"</span>:<span class="num">264</span>, <span class="key">"durationMs"</span>:<span class="num">4</span>}</div>
+      <div class="log-line"><span class="ts">2026-04-23T10:12:01.298Z</span>{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Telemetry queued"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-3B55TJYU"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#DENSO-CORP"</span>, <span class="key">"protoBytes"</span>:<span class="num">86</span>, <span class="key">"jsonBytes"</span>:<span class="num">265</span>, <span class="key">"durationMs"</span>:<span class="num">3</span>}</div>
+    </div>
+  </div>
 
-      <div class="log-line">
-        <span class="ts">2026-04-21T17:03:01.150Z</span>
-        <span class="log-json">{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Telemetry ingested"</span>, <span class="key">"requestId"</span>:<span class="val">"ac2ebda2-255d..."</span>, <span class="key">"functionName"</span>:<span class="val">"...ingest"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-TACM784E"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#ACME-MOTORS"</span>, <span class="key">"durationMs"</span>:<span class="num">419</span>}</span>
-      </div>
-      <div class="log-line">
-        <span class="ts">2026-04-21T17:03:01.203Z</span>
-        <span class="log-json">{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Telemetry ingested"</span>, <span class="key">"requestId"</span>:<span class="val">"f7d3c364-0f03..."</span>, <span class="key">"functionName"</span>:<span class="val">"...ingest"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-Z4LTJYPR"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#DENSO-CORP"</span>, <span class="key">"durationMs"</span>:<span class="num">274</span>}</span>
-      </div>
-      <div class="log-line">
-        <span class="ts">2026-04-21T17:03:02.226Z</span>
-        <span class="log-json">{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Telemetry ingested"</span>, <span class="key">"requestId"</span>:<span class="val">"66f2f21c-c8c9..."</span>, <span class="key">"functionName"</span>:<span class="val">"...ingest"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-3B55TJYU"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#DENSO-CORP"</span>, <span class="key">"durationMs"</span>:<span class="num">692</span>}</span>
-      </div>
-      <div class="log-line">
-        <span class="ts">2026-04-21T17:03:02.282Z</span>
-        <span class="log-json">{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Telemetry ingested"</span>, <span class="key">"requestId"</span>:<span class="val">"00f88c29-d2f8..."</span>, <span class="key">"functionName"</span>:<span class="val">"...ingest"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-TYBAT59P"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#ACME-MOTORS"</span>, <span class="key">"durationMs"</span>:<span class="num">738</span>}</span>
-      </div>
-      <div class="log-line">
-        <span class="ts">2026-04-21T17:03:02.665Z</span>
-        <span class="log-json">{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Telemetry ingested"</span>, <span class="key">"requestId"</span>:<span class="val">"875040d6-c26e..."</span>, <span class="key">"functionName"</span>:<span class="val">"...ingest"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-Z4LTJYPR"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#DENSO-CORP"</span>, <span class="key">"durationMs"</span>:<span class="num">50</span>}</span>
-      </div>
-      <div class="log-line">
-        <span class="ts" style="color:#3fb950">2026-04-21T17:03:03.365Z</span>
-        <span class="log-json" style="color:#3fb950">{<span class="key" style="color:#3fb950">"level"</span>:<span class="val" style="color:#3fb950">"INFO"</span>, <span class="key" style="color:#3fb950">"message"</span>:<span class="val" style="color:#3fb950">"Telemetry ingested"</span>, <span class="key" style="color:#3fb950">"deviceId"</span>:<span class="val" style="color:#3fb950">"VEHICLE#VIN-3B55TJYU"</span>, <span class="key" style="color:#3fb950">"tenantId"</span>:<span class="val" style="color:#3fb950">"TENANT#DENSO-CORP"</span>, <span class="key" style="color:#3fb950">"durationMs"</span>:<span class="num" style="color:#3fb950">46</span>}</span>
-      </div>
-      <div class="dim" style="margin-top:8px">... (continuing in real-time)</div>
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+      <span class="terminal-title">/aws/lambda/denso-vehicle-telemetry-dev-consumer — Kafka batch → S3 + DynamoDB</span>
+    </div>
+    <div class="terminal-body">
+      <div class="log-line"><span class="ts">2026-04-23T10:12:02.410Z</span>{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Record stored"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-Z4LTJYPR"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#DENSO-CORP"</span>, <span class="key">"messageId"</span>:<span class="val">"633fb406"</span>, <span class="key">"s3Key"</span>:<span class="val">"raw/TENANT#DENSO-CORP/..."</span>}</div>
+      <div class="log-line"><span class="ts">2026-04-23T10:12:02.438Z</span>{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Record stored"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-TACM784E"</span>, <span class="key">"tenantId"</span>:<span class="val">"TENANT#ACME-MOTORS"</span>, <span class="key">"messageId"</span>:<span class="val">"e4b2fee9"</span>, <span class="key">"s3Key"</span>:<span class="val">"raw/TENANT#ACME-MOTORS/..."</span>}</div>
+    </div>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+      <span class="terminal-title">/aws/lambda/denso-vehicle-telemetry-dev-enrichment — S3 event → anomaly + speedKmh</span>
+    </div>
+    <div class="terminal-body">
+      <div class="log-line"><span class="ts">2026-04-23T10:12:03.791Z</span>{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Enrichment complete"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-Z4LTJYPR"</span>, <span class="key">"anomalyFlag"</span>:<span class="green-val">false</span>, <span class="key">"speedKmh"</span>:<span class="num">102.03</span>, <span class="key">"durationMs"</span>:<span class="num">48</span>}</div>
+      <div class="log-line"><span class="ts">2026-04-23T10:12:03.812Z</span>{<span class="key">"level"</span>:<span class="val">"INFO"</span>, <span class="key">"message"</span>:<span class="val">"Enrichment complete"</span>, <span class="key">"deviceId"</span>:<span class="val">"VEHICLE#VIN-TACM784E"</span>, <span class="key">"anomalyFlag"</span>:<span class="green-val">false</span>, <span class="key">"speedKmh"</span>:<span class="num">97.55</span>, <span class="key">"durationMs"</span>:<span class="num">41</span>}</div>
     </div>
   </div>
 
   <div class="callout">
-    <strong>Structured JSON logging:</strong> Every log line is machine-parseable.
-    Fields: <code>level</code>, <code>message</code>, <code>requestId</code>, <code>functionName</code>, <code>deviceId</code>, <code>tenantId</code>, <code>messageId</code>, <code>durationMs</code>, <code>ts</code>.
-    This enables CloudWatch Insights queries like <code>filter tenantId = "TENANT#DENSO-CORP" | stats avg(durationMs)</code>
-    for per-tenant SLA monitoring.
+    <strong>3-stage structured logging:</strong>
+    <code>ingest</code> logs <code>protoBytes</code> vs <code>jsonBytes</code> per request (proof of 3× compression).
+    <code>consumer</code> logs per-record S3 key (batch traceable).
+    <code>enrichment</code> logs <code>anomalyFlag</code> + <code>speedKmh</code> per vehicle.
+    All queryable via CloudWatch Insights: <code>filter tenantId = "TENANT#DENSO-CORP" | stats avg(durationMs)</code>
   </div>
 </body>
 </html>

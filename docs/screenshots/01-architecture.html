@@ -8,14 +8,16 @@
   body { background: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #c9d1d9; padding: 40px; }
   h1 { font-size: 22px; color: #58a6ff; margin-bottom: 6px; }
   .subtitle { font-size: 13px; color: #8b949e; margin-bottom: 32px; }
-  .arch-box { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 32px; max-width: 900px; }
-  pre { font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.7; color: #c9d1d9; }
+  .arch-box { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 32px; max-width: 960px; }
+  pre { font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.75; color: #c9d1d9; }
   .highlight { color: #58a6ff; font-weight: bold; }
   .green { color: #3fb950; }
   .orange { color: #f0883e; }
   .purple { color: #d2a8ff; }
   .yellow { color: #e3b341; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 28px; max-width: 900px; }
+  .kafka { color: #e3b341; font-weight: bold; }
+  .proto { color: #79c0ff; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 28px; max-width: 960px; }
   .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px; }
   .card h3 { font-size: 13px; color: #58a6ff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin: 2px; }
@@ -23,50 +25,62 @@
   .badge-green { background: #1a7f3733; color: #3fb950; border: 1px solid #1a7f3766; }
   .badge-orange { background: #9e6a0333; color: #f0883e; border: 1px solid #9e6a0366; }
   .badge-purple { background: #6e40c933; color: #d2a8ff; border: 1px solid #6e40c966; }
+  .badge-yellow { background: #5a451033; color: #e3b341; border: 1px solid #e3b34166; }
 </style>
 </head>
 <body>
   <h1>Vehicle Telemetry Ingestion Service</h1>
-  <div class="subtitle">Serverless IoT data pipeline · AWS · Terraform IaC · Node.js</div>
+  <div class="subtitle">Serverless IoT pipeline · Protobuf + Kafka (MSK) · 1000 req/sec · AWS · Terraform IaC · Node.js 22</div>
 
   <div class="arch-box">
     <pre>
-<span class="yellow">  Vehicles / IoT Simulator (Detroit, MI area)</span>
-         │
-         │  HTTPS POST /v1/telemetry   (x-api-key + x-tenant-id)
-         ▼
-<span class="highlight">  ┌──────────────────────────────────────────────────────────────┐</span>
-<span class="highlight">  │  CloudFront   </span><span class="green">PriceClass_100 · HTTPS-only · GET cache 30s</span><span class="highlight">    │</span>
-<span class="highlight">  └──────────────────────────┬───────────────────────────────────┘</span>
-                             │  X-CF-Secret header enforced
-  <span class="highlight">┌────────────────────────────▼───────────────────────────────────┐</span>
-  <span class="highlight">│  API Gateway REST   </span><span class="green">API key auth · 1k req/day · 5 req/sec     </span><span class="highlight">│</span>
-  <span class="highlight">└──────────────┬──────────────────────────────────┬─────────────┘</span>
-               │                                  │
-   <span class="orange">┌────────────▼────────────┐</span>         <span class="orange">┌──────▼──────────────────┐</span>
-   <span class="orange">│  Ingest Lambda          │</span>         <span class="orange">│  Query Lambda           │</span>
-   <span class="orange">│  POST /v1/telemetry     │</span>         <span class="orange">│  GET /v1/devices/{id}/  │</span>
-   <span class="orange">│  256 MB · 10s · Node 22 │</span>         <span class="orange">│  telemetry              │</span>
-   <span class="orange">└──────┬──────────┬───────┘</span>         <span class="orange">└──────────────┬──────────┘</span>
-         │          │                               │
-         │          └──────────► <span class="purple">DynamoDB ◄─────────┘</span>
-         │                       <span class="purple">PAY_PER_REQUEST</span>
-         ▼                       <span class="purple">PK: deviceId · SK: timestamp</span>
-   <span class="green">S3 raw bucket</span>              <span class="purple">GSI: TenantIndex (tenantId + timestamp)</span>
-   <span class="green">SSE-AES256 · versioned</span>
-   <span class="green">lifecycle IA→Glacier</span>
-         │
-         │  ObjectCreated event
-         ▼
-   <span class="orange">┌──────────────────────┐</span>
-   <span class="orange">│  Enrichment Lambda   │</span>
-   <span class="orange">│  speedKmh · anomaly  │</span>
-   <span class="orange">│  geo zone · latency  │</span>
-   <span class="orange">│  512 MB · 60s        │</span>
-   <span class="orange">└──────────────────────┘</span>
-         │
-         ▼
-   <span class="green">S3 enriched/</span>  +  <span class="purple">DynamoDB UpdateItem</span>
+<span class="yellow">  Vehicles / IoT Simulator  (Detroit, MI area GPS)</span>
+          │
+          │  HTTPS POST /v1/telemetry
+          │  <span class="proto">Content-Type: application/x-protobuf  (85B vs 265B JSON — 3x smaller)</span>
+          ▼
+<span class="highlight">  ┌──────────────────────────────────────────────────────────────────┐</span>
+<span class="highlight">  │  CloudFront   </span><span class="green">PriceClass_100 · HTTPS-only · GET cache 30s      </span><span class="highlight"> │</span>
+<span class="highlight">  └─────────────────────────────┬────────────────────────────────────┘</span>
+                                │  X-CF-Secret origin header enforced
+  <span class="highlight">┌───────────────────────────────▼────────────────────────────────────┐</span>
+  <span class="highlight">│  API Gateway REST  </span><span class="green">API key auth · 10M req/day · 1000 req/sec     </span><span class="highlight"> │</span>
+  <span class="highlight">└────────────────┬──────────────────────────────┬────────────────────┘</span>
+                  │                              │
+   <span class="orange">┌──────────────▼──────────┐</span>       <span class="orange">┌──────▼──────────────────────┐</span>
+   <span class="orange">│  Ingest Lambda           │</span>       <span class="orange">│  Query Lambda               │</span>
+   <span class="orange">│  Protobuf decode         │</span>       <span class="orange">│  GET /v1/devices/{id}/      │</span>
+   <span class="orange">│  256 MB · 10s · Node 22  │</span>       <span class="orange">│       telemetry             │</span>
+   <span class="orange">└──────────────┬───────────┘</span>       <span class="orange">└──────────────┬──────────────┘</span>
+                  │ Kafka produce (~5ms)          │
+                  ▼                               │
+  <span class="kafka">  ┌─────────────────────────────────────────┐</span>   │
+  <span class="kafka">  │  MSK Serverless Kafka                   │</span>   │
+  <span class="kafka">  │  topic: vehicle-telemetry · 4 partitions│</span>   │
+  <span class="kafka">  │  PartitionKey = deviceId (ordering)     │</span>   │
+  <span class="kafka">  │                                         │</span>   │
+  <span class="kafka">  │  p0 ──► Consumer Lambda  (250/sec)      │</span>   │
+  <span class="kafka">  │  p1 ──► Consumer Lambda  (250/sec)      │</span>   │
+  <span class="kafka">  │  p2 ──► Consumer Lambda  (250/sec)      │</span>   │
+  <span class="kafka">  │  p3 ──► Consumer Lambda  (250/sec)      │</span>   │
+  <span class="kafka">  └─────────────────────┬───────────────────┘</span>   │
+                          │ batch write (100/call)  │
+                          ▼                         │
+                   <span class="green">S3 raw bucket ◄─────────────────┘</span>
+                   <span class="green">SSE-AES256 · versioned       </span><span class="purple">DynamoDB PAY_PER_REQUEST</span>
+                   <span class="green">lifecycle IA→Glacier         </span><span class="purple">PK: deviceId · SK: timestamp</span>
+                          │                    <span class="purple">GSI: TenantIndex (tenantId+ts)</span>
+                          │  ObjectCreated event
+                          ▼
+                   <span class="orange">┌──────────────────────┐</span>
+                   <span class="orange">│  Enrichment Lambda   │</span>
+                   <span class="orange">│  speedKmh · anomaly  │</span>
+                   <span class="orange">│  geo zone · latency  │</span>
+                   <span class="orange">│  512 MB · 60s        │</span>
+                   <span class="orange">└──────────────────────┘</span>
+                          │
+                          ▼
+                   <span class="green">S3 enriched/</span>  +  <span class="purple">DynamoDB UpdateItem</span>
     </pre>
   </div>
 
@@ -75,32 +89,39 @@
       <h3>AWS Services</h3>
       <span class="badge badge-blue">CloudFront</span>
       <span class="badge badge-blue">API Gateway REST</span>
-      <span class="badge badge-orange">Lambda ×3</span>
+      <span class="badge badge-orange">Lambda ×4</span>
+      <span class="badge badge-yellow">MSK Serverless</span>
       <span class="badge badge-purple">DynamoDB</span>
       <span class="badge badge-green">S3</span>
       <span class="badge badge-blue">IAM</span>
       <span class="badge badge-blue">VPC</span>
-      <span class="badge badge-blue">CloudWatch Logs</span>
+      <span class="badge badge-blue">CloudWatch</span>
+    </div>
+    <div class="card">
+      <h3>Horizontal Scaling</h3>
+      <p style="font-size:12px; color:#8b949e; line-height:1.6;">
+        <span style="color:#e3b341">4 partitions × 250/sec = 1000/sec</span><br><br>
+        To double throughput: add 4 partitions.<br>
+        Lambda auto-scales to match partition count.<br>
+        <span style="color:#3fb950">Zero code changes required.</span>
+      </p>
+    </div>
+    <div class="card">
+      <h3>Protobuf vs JSON</h3>
+      <p style="font-size:12px; color:#8b949e; line-height:1.6;">
+        JSON payload: <span style="color:#ff7b72">~265 bytes</span><br>
+        Protobuf payload: <span style="color:#3fb950">~85 bytes</span><br>
+        <span style="color:#79c0ff">3.1× smaller · strict schema contract</span><br><br>
+        At 1000/sec saves <strong style="color:#3fb950">540 MB/hour</strong> in transfer.
+      </p>
     </div>
     <div class="card">
       <h3>Security</h3>
       <span class="badge badge-green">CloudFront-only ingress</span>
       <span class="badge badge-green">Least-privilege IAM</span>
+      <span class="badge badge-green">MSK IAM/TLS auth</span>
       <span class="badge badge-green">SSE-AES256 S3</span>
-      <span class="badge badge-green">HTTPS-only</span>
-      <span class="badge badge-green">Tenant isolation in Lambda</span>
-      <span class="badge badge-green">API key + tenant header</span>
-    </div>
-    <div class="card">
-      <h3>Multi-tenancy</h3>
-      <span class="badge badge-purple">TENANT#DENSO-CORP</span>
-      <span class="badge badge-orange">TENANT#ACME-MOTORS</span>
-      <p style="font-size:12px; color:#8b949e; margin-top:8px;">Tenant scoping enforced in Lambda logic. DynamoDB GSI enables per-tenant queries. Compromised key cannot access other tenant's data.</p>
-    </div>
-    <div class="card">
-      <h3>Cost at rest</h3>
-      <p style="font-size:12px; color:#3fb950; margin-top:4px;">≈ <strong style="color:#3fb950">$0.00 / month</strong></p>
-      <p style="font-size:12px; color:#8b949e; margin-top:6px;">Lambda, DynamoDB, S3, CloudFront — all consumption-priced. No NAT Gateway. No RDS. No idle compute.</p>
+      <span class="badge badge-green">Tenant isolation</span>
     </div>
   </div>
 </body>

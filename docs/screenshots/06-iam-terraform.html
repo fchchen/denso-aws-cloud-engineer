@@ -33,96 +33,93 @@
 </head>
 <body>
   <h1>IAM Least-Privilege + Terraform IaC</h1>
-  <div class="subtitle">Per-Lambda execution roles · Explicit ARN bindings · No wildcards on resources</div>
+  <div class="subtitle">4 per-Lambda execution roles · Explicit ARN bindings · No wildcards on resources</div>
 
   <div class="grid">
     <div class="code-block">
       <div class="code-bar">
         <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
-        <span class="code-title">modules/iam/main.tf — ingest-role policy</span>
+        <span class="code-title">modules/iam/main.tf — ingest-role (Kafka write only)</span>
       </div>
       <div class="code-body">
-<span class="tf-comment"># Ingest Lambda: write-only, no read access</span>
+<span class="tf-comment"># Ingest: decode Protobuf, produce to Kafka — no S3/DynamoDB access</span>
 <span class="tf-resource">data</span> <span class="tf-string">"aws_iam_policy_document"</span> <span class="tf-string">"ingest"</span> {
+
+  statement {
+    <span class="tf-attr">sid</span>     = <span class="tf-string">"KafkaWrite"</span>
+    <span class="tf-attr">actions</span> = [
+      <span class="tf-string">"kafka-cluster:Connect"</span>,
+      <span class="tf-string">"kafka-cluster:WriteData"</span>,
+      <span class="tf-string">"kafka-cluster:DescribeTopic"</span>,
+    ]
+    resources = [
+      <span class="tf-var">var.msk_cluster_arn</span>,
+      <span class="tf-string">"${var.msk_cluster_arn}/topic/vehicle-telemetry"</span>,
+    ]  <span class="tf-comment"># cannot read S3, DynamoDB, or other topics</span>
+  }
+
+  statement {
+    <span class="tf-attr">sid</span> = <span class="tf-string">"Logs"</span>
+    <span class="tf-attr">actions</span> = [<span class="tf-string">"logs:CreateLogStream"</span>, <span class="tf-string">"logs:PutLogEvents"</span>]
+    resources = [<span class="tf-string">"arn:aws:logs:us-east-1:${var.account_id}:log-group:/aws/lambda/*"</span>]
+  }
+}
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-bar">
+        <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+        <span class="code-title">modules/iam/main.tf — consumer-role (Kafka read + S3/DynamoDB write)</span>
+      </div>
+      <div class="code-body">
+<span class="tf-comment"># Consumer: read Kafka batches, write raw S3 + DynamoDB</span>
+<span class="tf-resource">data</span> <span class="tf-string">"aws_iam_policy_document"</span> <span class="tf-string">"consumer"</span> {
+
+  statement {
+    <span class="tf-attr">sid</span>     = <span class="tf-string">"KafkaRead"</span>
+    <span class="tf-attr">actions</span> = [
+      <span class="tf-string">"kafka-cluster:Connect"</span>,
+      <span class="tf-string">"kafka-cluster:ReadData"</span>,
+      <span class="tf-string">"kafka-cluster:DescribeGroup"</span>,
+    ]
+    resources = [<span class="tf-var">var.msk_cluster_arn</span>, ...]
+  }
 
   statement {
     <span class="tf-attr">sid</span>     = <span class="tf-string">"S3Write"</span>
     <span class="tf-attr">actions</span> = [<span class="tf-string">"s3:PutObject"</span>]
-    resources = [
-      <span class="tf-string">"${var.raw_bucket_arn}/raw/*"</span>
-    ]  <span class="tf-comment"># exact ARN, not "*"</span>
+    resources = [<span class="tf-string">"${var.raw_bucket_arn}/raw/*"</span>]
   }
 
   statement {
     <span class="tf-attr">sid</span>     = <span class="tf-string">"DynamoWrite"</span>
     <span class="tf-attr">actions</span> = [<span class="tf-string">"dynamodb:PutItem"</span>]
     resources = [<span class="tf-var">var.dynamodb_table_arn</span>]
-    <span class="tf-comment"># cannot Read, Update, or Delete</span>
-  }
-
-  statement {
-    <span class="tf-attr">sid</span> = <span class="tf-string">"Logs"</span>
-    <span class="tf-attr">actions</span> = [
-      <span class="tf-string">"logs:CreateLogGroup"</span>,
-      <span class="tf-string">"logs:CreateLogStream"</span>,
-      <span class="tf-string">"logs:PutLogEvents"</span>
-    ]
-    resources = [
-      <span class="tf-string">"arn:aws:logs:us-east-1:${var.account_id}:log-group:/aws/lambda/*"</span>
-    ]
-  }
-}
-      </div>
-    </div>
-
-    <div class="code-block">
-      <div class="code-bar">
-        <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
-        <span class="code-title">modules/iam/main.tf — query-role policy</span>
-      </div>
-      <div class="code-body">
-<span class="tf-comment"># Query Lambda: read-only, cannot write</span>
-<span class="tf-resource">data</span> <span class="tf-string">"aws_iam_policy_document"</span> <span class="tf-string">"query"</span> {
-
-  statement {
-    <span class="tf-attr">sid</span>     = <span class="tf-string">"DynamoQuery"</span>
-    <span class="tf-attr">actions</span> = [<span class="tf-string">"dynamodb:Query"</span>]
-    resources = [
-      <span class="tf-var">var.dynamodb_table_arn</span>,
-      <span class="tf-string">"${var.dynamodb_table_arn}/index/TenantIndex"</span>
-    ]
-    <span class="tf-comment"># cannot Scan, PutItem, UpdateItem, DeleteItem</span>
-    <span class="tf-comment"># cannot touch S3 at all</span>
-  }
-
-  statement {
-    <span class="tf-attr">sid</span> = <span class="tf-string">"Logs"</span>
-    <span class="tf-attr">actions</span> = [
-      <span class="tf-string">"logs:CreateLogGroup"</span>,
-      <span class="tf-string">"logs:CreateLogStream"</span>,
-      <span class="tf-string">"logs:PutLogEvents"</span>
-    ]
-    resources = [
-      <span class="tf-string">"arn:aws:logs:us-east-1:${var.account_id}:log-group:/aws/lambda/*"</span>
-    ]
+    <span class="tf-comment"># cannot Query, UpdateItem, or touch enriched/ prefix</span>
   }
 }
       </div>
     </div>
   </div>
 
-  <div class="section-title">Terraform Module Structure — 7 modules, 53 resources</div>
+  <div class="section-title">Terraform Module Structure — 8 modules, ~65 resources</div>
 
   <div class="modules-grid">
     <div class="module-card">
       <div class="module-icon">🌐</div>
       <div class="module-name">vpc</div>
-      <p style="font-size:10px; color:#6e7681; margin-top:4px;">VPC · 2 subnets · IGW · SG</p>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">VPC · 2 subnets · IGW · Lambda SG · Kafka SG</p>
+    </div>
+    <div class="module-card">
+      <div class="module-icon" style="color:#e3b341">⚡</div>
+      <div class="module-name" style="color:#e3b341">msk</div>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">MSK Serverless · IAM/TLS · 4 partitions</p>
     </div>
     <div class="module-card">
       <div class="module-icon">🔐</div>
       <div class="module-name">iam</div>
-      <p style="font-size:10px; color:#6e7681; margin-top:4px;">3 roles · 3 policies · least-privilege</p>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">4 roles · 4 policies · least-privilege</p>
     </div>
     <div class="module-card">
       <div class="module-icon">🪣</div>
@@ -137,22 +134,23 @@
     <div class="module-card">
       <div class="module-icon">λ</div>
       <div class="module-name">lambda</div>
-      <p style="font-size:10px; color:#6e7681; margin-top:4px;">3 functions · CW log groups · S3 permission</p>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">4 functions · Kafka ESM · VPC config</p>
     </div>
     <div class="module-card">
       <div class="module-icon">🔀</div>
       <div class="module-name">api_gateway</div>
-      <p style="font-size:10px; color:#6e7681; margin-top:4px;">REST API · key · usage plan · 3 routes</p>
+      <p style="font-size:10px; color:#6e7681; margin-top:4px;">REST API · key · 1000/sec · 3 routes</p>
     </div>
     <div class="module-card">
-      <div class="module-icon">⚡</div>
+      <div class="module-icon">☁️</div>
       <div class="module-name">cloudfront</div>
       <p style="font-size:10px; color:#6e7681; margin-top:4px;">Distribution · cache behaviors · origin secret</p>
     </div>
-    <div class="module-card" style="border-color:#3fb950; background:#0d2218;">
-      <div class="module-icon" style="color:#3fb950">✓</div>
-      <div class="module-name" style="color:#3fb950">53 resources</div>
-      <p style="font-size:10px; color:#3fb950; margin-top:4px;">all deployed · $0 idle cost</p>
+  </div>
+
+  <div style="margin-top: 14px; max-width: 960px;">
+    <div class="module-card" style="border-color:#3fb950; background:#0d2218; text-align:center; padding: 12px;">
+      <span style="color:#3fb950; font-size:13px; font-family:monospace;">✓ ~65 resources · $0 idle (MSK $0.75/hr only during demo)</span>
     </div>
   </div>
 </body>
