@@ -82,6 +82,7 @@ resource "aws_lambda_event_source_mapping" "kafka" {
   function_name     = aws_lambda_function.consumer.arn
   starting_position = "LATEST"
   batch_size        = 100
+  enabled           = true
 
   amazon_managed_kafka_event_source_config {
     consumer_group_id = "vehicle-telemetry-consumers"

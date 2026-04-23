@@ -14,7 +14,7 @@ const TABLE  = process.env.DYNAMODB_TABLE_NAME;
 export async function handler(event, context) {
   const log = createLogger(context);
 
-  const records = event.records?.["vehicle-telemetry"] ?? [];
+  const records = Object.values(event.records ?? {}).flat();
 
   await Promise.all(records.map(async (record) => {
     let payload;

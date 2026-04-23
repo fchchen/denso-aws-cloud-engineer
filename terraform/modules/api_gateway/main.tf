@@ -2,6 +2,8 @@ resource "aws_api_gateway_rest_api" "main" {
   name        = "${var.project}-${var.environment}"
   description = "Vehicle Telemetry Ingestion API"
 
+  binary_media_types = ["application/x-protobuf"]
+
   endpoint_configuration {
     types = ["REGIONAL"]
   }
@@ -161,6 +163,7 @@ resource "aws_api_gateway_deployment" "main" {
 
   triggers = {
     redeployment = sha1(jsonencode([
+      aws_api_gateway_rest_api.main.binary_media_types,
       aws_api_gateway_resource.telemetry.id,
       aws_api_gateway_method.telemetry_post.id,
       aws_api_gateway_integration.telemetry_post.id,

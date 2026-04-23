@@ -23,11 +23,22 @@ data "aws_iam_policy_document" "ingest" {
       "kafka-cluster:Connect",
       "kafka-cluster:WriteData",
       "kafka-cluster:DescribeTopic",
+      "kafka-cluster:CreateTopic",
     ]
     resources = [
       var.msk_cluster_arn,
-      "${var.msk_cluster_arn}/topic/vehicle-telemetry",
+      "${replace(var.msk_cluster_arn, ":cluster/", ":topic/")}/vehicle-telemetry",
     ]
+  }
+
+  statement {
+    sid     = "VPC"
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DeleteNetworkInterface",
+    ]
+    resources = ["*"]
   }
 
   statement {
@@ -57,6 +68,15 @@ resource "aws_iam_role" "consumer" {
 
 data "aws_iam_policy_document" "consumer" {
   statement {
+    sid     = "KafkaDescribe"
+    actions = [
+      "kafka:DescribeClusterV2",
+      "kafka:GetBootstrapBrokers",
+    ]
+    resources = [var.msk_cluster_arn]
+  }
+
+  statement {
     sid     = "KafkaRead"
     actions = [
       "kafka-cluster:Connect",
@@ -64,11 +84,12 @@ data "aws_iam_policy_document" "consumer" {
       "kafka-cluster:DescribeGroup",
       "kafka-cluster:AlterGroup",
       "kafka-cluster:DescribeTopic",
+      "kafka-cluster:CreateTopic",
     ]
     resources = [
       var.msk_cluster_arn,
-      "${var.msk_cluster_arn}/topic/vehicle-telemetry",
-      "${var.msk_cluster_arn}/group/vehicle-telemetry-consumers",
+      "${replace(var.msk_cluster_arn, ":cluster/", ":topic/")}/vehicle-telemetry",
+      "${replace(var.msk_cluster_arn, ":cluster/", ":group/")}/vehicle-telemetry-consumers",
     ]
   }
 
@@ -82,6 +103,19 @@ data "aws_iam_policy_document" "consumer" {
     sid       = "DynamoWrite"
     actions   = ["dynamodb:PutItem"]
     resources = [var.dynamodb_table_arn]
+  }
+
+  statement {
+    sid     = "VPC"
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs",
+    ]
+    resources = ["*"]
   }
 
   statement {

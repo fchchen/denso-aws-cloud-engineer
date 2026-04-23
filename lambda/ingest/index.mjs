@@ -14,9 +14,8 @@ const AWS_REGION        = process.env.AWS_REGION ?? "us-east-1";
 
 let producer = null;
 
-async function getProducer() {
-  if (producer) return producer;
-  const kafka = new Kafka({
+async function getKafka() {
+  return new Kafka({
     clientId: "ingest-lambda",
     brokers:  [BOOTSTRAP_BROKERS],
     ssl: true,
@@ -28,6 +27,24 @@ async function getProducer() {
       },
     },
   });
+}
+
+async function ensureTopic(kafka) {
+  const admin = kafka.admin();
+  await admin.connect();
+  const existing = await admin.listTopics();
+  if (!existing.includes(KAFKA_TOPIC)) {
+    await admin.createTopics({
+      topics: [{ topic: KAFKA_TOPIC, numPartitions: 4, replicationFactor: 1 }],
+    });
+  }
+  await admin.disconnect();
+}
+
+async function getProducer() {
+  if (producer) return producer;
+  const kafka = await getKafka();
+  await ensureTopic(kafka);
   producer = kafka.producer();
   await producer.connect();
   return producer;
