@@ -132,8 +132,8 @@ Encoding  : Protobuf 85B vs JSON 265B  (3.1x smaller)
 VIN           Tenant                Reading  Speed(mph)  RPM     Fuel%   Status
 --------------------------------------------------------------------------------
 VIN-8SCJSPZU  ACME-MOTORS           1/10     4.2         851     80.2    ✓ 202
-VIN-5UAKVZEH  DENSO-CORP            1/10     3.7         834     80.8    ✓ 202
-VIN-VDDPVHX5  DENSO-CORP            1/10     1.5         828     80.4    ✓ 202
+VIN-5UAKVZEH  FLEET-CORP            1/10     3.7         834     80.8    ✓ 202
+VIN-VDDPVHX5  FLEET-CORP            1/10     1.5         828     80.4    ✓ 202
 ...
 
 Simulation complete. 30/30 accepted (202).
@@ -156,7 +156,7 @@ node simulator.js --vehicles 200 --readings 5 --interval 0 \
   "items": [
     {
       "deviceId":            "VEHICLE#VIN-Z4LTJYPR",
-      "tenantId":            "TENANT#DENSO-CORP",
+      "tenantId":            "TENANT#FLEET-CORP",
       "timestamp":           "2026-04-21T17:03:05.696Z",
       "speed":               63.4,
       "speedKmh":            102.03,
@@ -167,8 +167,8 @@ node simulator.js --vehicles 200 --readings 5 --interval 0 \
       "anomalyFlag":         false,
       "enrichedAt":          "2026-04-21T17:03:05.791Z",
       "processingLatencyMs": 1248,
-      "s3Key":    "raw/TENANT#DENSO-CORP/VEHICLE#VIN-Z4LTJYPR/2026-04-21/<uuid>.json",
-      "enrichedKey": "enriched/TENANT#DENSO-CORP/VEHICLE#VIN-Z4LTJYPR/2026-04-21/<uuid>.json"
+      "s3Key":    "raw/TENANT#FLEET-CORP/VEHICLE#VIN-Z4LTJYPR/2026-04-21/<uuid>.json",
+      "enrichedKey": "enriched/TENANT#FLEET-CORP/VEHICLE#VIN-Z4LTJYPR/2026-04-21/<uuid>.json"
     }
   ]
 }
@@ -181,14 +181,14 @@ node simulator.js --vehicles 200 --readings 5 --interval 0 \
 ## CloudWatch Logs — Structured JSON
 
 ```json
-{"level":"INFO","message":"Telemetry queued","deviceId":"VEHICLE#VIN-Z4LTJYPR","tenantId":"TENANT#DENSO-CORP","messageId":"633fb406","protoBytes":85,"jsonBytes":265,"durationMs":5}
-{"level":"INFO","message":"Record stored","deviceId":"VEHICLE#VIN-Z4LTJYPR","tenantId":"TENANT#DENSO-CORP","messageId":"633fb406","s3Key":"raw/..."}
+{"level":"INFO","message":"Telemetry queued","deviceId":"VEHICLE#VIN-Z4LTJYPR","tenantId":"TENANT#FLEET-CORP","messageId":"633fb406","protoBytes":85,"jsonBytes":265,"durationMs":5}
+{"level":"INFO","message":"Record stored","deviceId":"VEHICLE#VIN-Z4LTJYPR","tenantId":"TENANT#FLEET-CORP","messageId":"633fb406","s3Key":"raw/..."}
 {"level":"INFO","message":"Enrichment complete","deviceId":"VEHICLE#VIN-Z4LTJYPR","anomalyFlag":false,"durationMs":48}
 ```
 
 Queryable with CloudWatch Insights:
 ```sql
-filter tenantId = "TENANT#DENSO-CORP"
+filter tenantId = "TENANT#FLEET-CORP"
 | stats avg(durationMs), count() by bin(5m)
 ```
 

@@ -41,7 +41,7 @@ if (!API_URL || !API_KEY) {
   process.exit(1);
 }
 
-const TENANTS = ["TENANT#DENSO-CORP", "TENANT#ACME-MOTORS"];
+const TENANTS = ["TENANT#FLEET-CORP", "TENANT#ACME-MOTORS"];
 
 const BASE_LOCATIONS = [
   { lat: 42.3314, lng: -83.0458 },
@@ -116,7 +116,7 @@ function pad(str, n) { return String(str).padEnd(n); }
 async function main() {
   // Load Protobuf schema
   const root = await protobuf.load(new URL("../proto/telemetry.proto", import.meta.url).pathname);
-  const VehicleTelemetry = root.lookupType("denso.telemetry.v1.VehicleTelemetry");
+  const VehicleTelemetry = root.lookupType("vehicle.telemetry.v1.VehicleTelemetry");
 
   const vehicles = Array.from({ length: NUM_VEHICLES }, (_, i) => ({
     vin:      generateVin(),

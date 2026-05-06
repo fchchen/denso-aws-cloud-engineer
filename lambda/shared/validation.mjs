@@ -1,4 +1,4 @@
-const ALLOWED_TENANTS = ["TENANT#DENSO-CORP", "TENANT#ACME-MOTORS"];
+const ALLOWED_TENANTS = ["TENANT#FLEET-CORP", "TENANT#ACME-MOTORS"];
 
 export function validateTelemetryPayload(body) {
   let parsed;

@@ -3,10 +3,10 @@ import { randomUUID } from "crypto";
 import { createLogger } from "../shared/logger.mjs";
 import { validateTenantId } from "../shared/validation.mjs";
 import { accepted, badRequest, unauthorized, internalError } from "../shared/response.mjs";
-import { denso } from "../shared/telemetry_pb.mjs";
+import { vehicle } from "../shared/telemetry_pb.mjs";
 import { generateAuthToken } from "aws-msk-iam-sasl-signer-js";
 
-const VehicleTelemetry = denso.telemetry.v1.VehicleTelemetry;
+const VehicleTelemetry = vehicle.telemetry.v1.VehicleTelemetry;
 
 const BOOTSTRAP_BROKERS = process.env.KAFKA_BOOTSTRAP_BROKERS;
 const KAFKA_TOPIC       = process.env.KAFKA_TOPIC;

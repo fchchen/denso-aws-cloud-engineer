@@ -5,7 +5,7 @@ variable "aws_region" {
 
 variable "project" {
   type    = string
-  default = "denso-vehicle-telemetry"
+  default = "vehicle-telemetry"
 }
 
 variable "environment" {

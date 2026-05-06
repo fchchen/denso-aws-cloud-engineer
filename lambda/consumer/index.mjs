@@ -1,9 +1,9 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { createLogger } from "../shared/logger.mjs";
-import { denso } from "../shared/telemetry_pb.mjs";
+import { vehicle } from "../shared/telemetry_pb.mjs";
 
-const VehicleTelemetry = denso.telemetry.v1.VehicleTelemetry;
+const VehicleTelemetry = vehicle.telemetry.v1.VehicleTelemetry;
 
 const s3     = new S3Client({});
 const dynamo = new DynamoDBClient({});

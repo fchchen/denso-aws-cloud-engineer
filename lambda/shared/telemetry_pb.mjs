@@ -7,20 +7,20 @@ const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.
 // Exported root namespace
 const $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
-export const denso = $root.denso = (() => {
+export const vehicle = $root.vehicle = (() => {
 
     /**
-     * Namespace denso.
-     * @exports denso
+     * Namespace vehicle.
+     * @exports vehicle
      * @namespace
      */
-    const denso = {};
+    const vehicle = {};
 
-    denso.telemetry = (function() {
+    vehicle.telemetry = (function() {
 
         /**
          * Namespace telemetry.
-         * @memberof denso
+         * @memberof vehicle
          * @namespace
          */
         const telemetry = {};
@@ -29,7 +29,7 @@ export const denso = $root.denso = (() => {
 
             /**
              * Namespace v1.
-             * @memberof denso.telemetry
+             * @memberof vehicle.telemetry
              * @namespace
              */
             const v1 = {};
@@ -38,7 +38,7 @@ export const denso = $root.denso = (() => {
 
                 /**
                  * Properties of a VehicleTelemetry.
-                 * @memberof denso.telemetry.v1
+                 * @memberof vehicle.telemetry.v1
                  * @interface IVehicleTelemetry
                  * @property {string|null} [deviceId] VehicleTelemetry deviceId
                  * @property {string|null} [tenantId] VehicleTelemetry tenantId
@@ -54,11 +54,11 @@ export const denso = $root.denso = (() => {
 
                 /**
                  * Constructs a new VehicleTelemetry.
-                 * @memberof denso.telemetry.v1
+                 * @memberof vehicle.telemetry.v1
                  * @classdesc Represents a VehicleTelemetry.
                  * @implements IVehicleTelemetry
                  * @constructor
-                 * @param {denso.telemetry.v1.IVehicleTelemetry=} [properties] Properties to set
+                 * @param {vehicle.telemetry.v1.IVehicleTelemetry=} [properties] Properties to set
                  */
                 function VehicleTelemetry(properties) {
                     if (properties)
@@ -70,7 +70,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry deviceId.
                  * @member {string} deviceId
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.deviceId = "";
@@ -78,7 +78,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry tenantId.
                  * @member {string} tenantId
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.tenantId = "";
@@ -86,7 +86,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry timestamp.
                  * @member {string} timestamp
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.timestamp = "";
@@ -94,7 +94,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry speed.
                  * @member {number} speed
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.speed = 0;
@@ -102,7 +102,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry rpm.
                  * @member {number} rpm
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.rpm = 0;
@@ -110,7 +110,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry fuel.
                  * @member {number} fuel
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.fuel = 0;
@@ -118,7 +118,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry lat.
                  * @member {number} lat
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.lat = 0;
@@ -126,7 +126,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry lng.
                  * @member {number} lng
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.lng = 0;
@@ -134,7 +134,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry messageId.
                  * @member {string} messageId
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.messageId = "";
@@ -142,7 +142,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * VehicleTelemetry receivedAt.
                  * @member {string} receivedAt
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  */
                 VehicleTelemetry.prototype.receivedAt = "";
@@ -150,21 +150,21 @@ export const denso = $root.denso = (() => {
                 /**
                  * Creates a new VehicleTelemetry instance using the specified properties.
                  * @function create
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @static
-                 * @param {denso.telemetry.v1.IVehicleTelemetry=} [properties] Properties to set
-                 * @returns {denso.telemetry.v1.VehicleTelemetry} VehicleTelemetry instance
+                 * @param {vehicle.telemetry.v1.IVehicleTelemetry=} [properties] Properties to set
+                 * @returns {vehicle.telemetry.v1.VehicleTelemetry} VehicleTelemetry instance
                  */
                 VehicleTelemetry.create = function create(properties) {
                     return new VehicleTelemetry(properties);
                 };
 
                 /**
-                 * Encodes the specified VehicleTelemetry message. Does not implicitly {@link denso.telemetry.v1.VehicleTelemetry.verify|verify} messages.
+                 * Encodes the specified VehicleTelemetry message. Does not implicitly {@link vehicle.telemetry.v1.VehicleTelemetry.verify|verify} messages.
                  * @function encode
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @static
-                 * @param {denso.telemetry.v1.IVehicleTelemetry} message VehicleTelemetry message or plain object to encode
+                 * @param {vehicle.telemetry.v1.IVehicleTelemetry} message VehicleTelemetry message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
@@ -195,11 +195,11 @@ export const denso = $root.denso = (() => {
                 };
 
                 /**
-                 * Encodes the specified VehicleTelemetry message, length delimited. Does not implicitly {@link denso.telemetry.v1.VehicleTelemetry.verify|verify} messages.
+                 * Encodes the specified VehicleTelemetry message, length delimited. Does not implicitly {@link vehicle.telemetry.v1.VehicleTelemetry.verify|verify} messages.
                  * @function encodeDelimited
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @static
-                 * @param {denso.telemetry.v1.IVehicleTelemetry} message VehicleTelemetry message or plain object to encode
+                 * @param {vehicle.telemetry.v1.IVehicleTelemetry} message VehicleTelemetry message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
@@ -210,18 +210,18 @@ export const denso = $root.denso = (() => {
                 /**
                  * Decodes a VehicleTelemetry message from the specified reader or buffer.
                  * @function decode
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {denso.telemetry.v1.VehicleTelemetry} VehicleTelemetry
+                 * @returns {vehicle.telemetry.v1.VehicleTelemetry} VehicleTelemetry
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
                 VehicleTelemetry.decode = function decode(reader, length, error) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    let end = length === undefined ? reader.len : reader.pos + length, message = new $root.denso.telemetry.v1.VehicleTelemetry();
+                    let end = length === undefined ? reader.len : reader.pos + length, message = new $root.vehicle.telemetry.v1.VehicleTelemetry();
                     while (reader.pos < end) {
                         let tag = reader.uint32();
                         if (tag === error)
@@ -278,10 +278,10 @@ export const denso = $root.denso = (() => {
                 /**
                  * Decodes a VehicleTelemetry message from the specified reader or buffer, length delimited.
                  * @function decodeDelimited
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @returns {denso.telemetry.v1.VehicleTelemetry} VehicleTelemetry
+                 * @returns {vehicle.telemetry.v1.VehicleTelemetry} VehicleTelemetry
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
@@ -294,7 +294,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * Verifies a VehicleTelemetry message.
                  * @function verify
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -338,15 +338,15 @@ export const denso = $root.denso = (() => {
                 /**
                  * Creates a VehicleTelemetry message from a plain object. Also converts values to their respective internal types.
                  * @function fromObject
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @static
                  * @param {Object.<string,*>} object Plain object
-                 * @returns {denso.telemetry.v1.VehicleTelemetry} VehicleTelemetry
+                 * @returns {vehicle.telemetry.v1.VehicleTelemetry} VehicleTelemetry
                  */
                 VehicleTelemetry.fromObject = function fromObject(object) {
-                    if (object instanceof $root.denso.telemetry.v1.VehicleTelemetry)
+                    if (object instanceof $root.vehicle.telemetry.v1.VehicleTelemetry)
                         return object;
-                    let message = new $root.denso.telemetry.v1.VehicleTelemetry();
+                    let message = new $root.vehicle.telemetry.v1.VehicleTelemetry();
                     if (object.deviceId != null)
                         message.deviceId = String(object.deviceId);
                     if (object.tenantId != null)
@@ -373,9 +373,9 @@ export const denso = $root.denso = (() => {
                 /**
                  * Creates a plain object from a VehicleTelemetry message. Also converts values to other types if specified.
                  * @function toObject
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @static
-                 * @param {denso.telemetry.v1.VehicleTelemetry} message VehicleTelemetry
+                 * @param {vehicle.telemetry.v1.VehicleTelemetry} message VehicleTelemetry
                  * @param {$protobuf.IConversionOptions} [options] Conversion options
                  * @returns {Object.<string,*>} Plain object
                  */
@@ -421,7 +421,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * Converts this VehicleTelemetry to JSON.
                  * @function toJSON
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @instance
                  * @returns {Object.<string,*>} JSON object
                  */
@@ -432,7 +432,7 @@ export const denso = $root.denso = (() => {
                 /**
                  * Gets the default type url for VehicleTelemetry
                  * @function getTypeUrl
-                 * @memberof denso.telemetry.v1.VehicleTelemetry
+                 * @memberof vehicle.telemetry.v1.VehicleTelemetry
                  * @static
                  * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
                  * @returns {string} The default type url
@@ -441,7 +441,7 @@ export const denso = $root.denso = (() => {
                     if (typeUrlPrefix === undefined) {
                         typeUrlPrefix = "type.googleapis.com";
                     }
-                    return typeUrlPrefix + "/denso.telemetry.v1.VehicleTelemetry";
+                    return typeUrlPrefix + "/vehicle.telemetry.v1.VehicleTelemetry";
                 };
 
                 return VehicleTelemetry;
@@ -453,7 +453,7 @@ export const denso = $root.denso = (() => {
         return telemetry;
     })();
 
-    return denso;
+    return vehicle;
 })();
 
 export { $root as default };

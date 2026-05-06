@@ -1,5 +1,5 @@
 syntax = "proto3";
-package denso.telemetry.v1;
+package vehicle.telemetry.v1;
 
 message VehicleTelemetry {
   string device_id   = 1;
